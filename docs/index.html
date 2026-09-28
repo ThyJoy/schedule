@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Расписание</title>
+  <meta name="description" content="Расписание занятий из файла Word">
+  <meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141517" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Расписание">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-row">
+      <div class="top-title">
+        <h1 id="courseTitle">Расписание</h1>
+        <div class="top-sub"><span id="weekLabel"></span></div>
+      </div>
+      <button class="icon-btn" id="todayBtn" aria-label="Сегодня" title="Сегодня">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="12" cy="15" r="1.6" class="fill"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Настройки" title="Настройки">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg>
+      </button>
+    </div>
+
+    <nav class="week" aria-label="Дни недели">
+      <button class="week-arrow" id="prevWeek" aria-label="Предыдущая неделя">‹</button>
+      <div class="days" id="days"></div>
+      <button class="week-arrow" id="nextWeek" aria-label="Следующая неделя">›</button>
+    </nav>
+
+    <div class="seg" role="tablist">
+      <button role="tab" data-view="day" class="active">День</button>
+      <button role="tab" data-view="week">Неделя</button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1"></main>
+
+  <!-- Настройки -->
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+  <section class="sheet" id="sheet" aria-hidden="true" aria-label="Настройки">
+    <div class="sheet-handle"></div>
+    <h2>Настройки</h2>
+
+    <label class="field">
+      <span>Курс</span>
+      <select id="courseSelect"></select>
+    </label>
+
+    <label class="field">
+      <span>Начало занятий</span>
+      <input type="date" id="startDate">
+      <p class="hint">Берётся из файла (самая ранняя дата «с …»). До этой даты пары не показываются, недели считаются от неё.</p>
+    </label>
+
+    <div class="field">
+      <span>Чётность недели</span>
+      <div class="parity">
+        <div id="parityText"></div>
+        <button class="btn small" id="parityFlip">Поменять</button>
+      </div>
+      <p class="hint">Неделя, в которую начинаются занятия, считается первой (нечётной). Если в расписании наоборот — нажмите «Поменять».</p>
+    </div>
+
+    <label class="switch-row">
+      <span>Показывать занятия других недель и периодов</span>
+      <input type="checkbox" id="showAll">
+    </label>
+
+    <div class="field">
+      <span>Файл расписания</span>
+      <div class="file-info" id="fileInfo"></div>
+      <label class="btn primary file-btn">
+        Загрузить новый файл (.doc / .docx)
+        <input type="file" id="fileInput" accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+      </label>
+      <button class="btn ghost" id="resetBtn">Вернуть встроенное расписание</button>
+    </div>
+
+    <p class="hint" id="installHint"></p>
+    <button class="btn" id="closeSheet">Готово</button>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="vendor/cfb.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
+  <script src="parser.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
