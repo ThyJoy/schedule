@@ -1,5 +1,5 @@
 // Офлайн-кэш приложения + приём файла через «Поделиться» (Web Share Target)
-const CACHE = 'schedule-app-v1';
+const CACHE = 'schedule-app-v2';
 const ASSETS = [
   './', 'index.html', 'style.css', 'app.js', 'parser.js', 'schedule.json', 'manifest.webmanifest',
   'vendor/cfb.min.js', 'vendor/jszip.min.js',

@@ -184,9 +184,9 @@
     let html = `<div class="date-head"><h2>${isToday ? 'Сегодня, ' : ''}${title}</h2><span class="count">${cnt ? `${cnt} ${plural(cnt, 'пара', 'пары', 'пар')}` : ''}</span></div>`;
 
     if (beforeStart(d) && !state.settings.showAll) {
-      html += `<div class="empty"><div class="big">Занятия начнутся ${fmtLong(semesterStart())}</div><button class="btn small" id="toStart" style="margin-top:12px">Показать первый день</button></div>`;
+      html += `<div class="empty"><div class="critter" aria-hidden="true">${critter(d)}</div><div class="big">Занятия начнутся ${fmtLong(semesterStart())}</div><div>${esc(chill(d))}</div><button class="btn small" id="toStart" style="margin-top:12px">Показать первый день</button></div>`;
     } else if (!slots.length) {
-      html += `<div class="empty"><div class="big">Занятий нет</div>${isoWeekday(d) === 7 ? 'Воскресенье' : 'Можно отдохнуть'}</div>`;
+      html += `<div class="empty"><div class="critter" aria-hidden="true">${critter(d)}</div><div class="big">${isoWeekday(d) === 7 ? 'Воскресенье, пар нет' : 'Пар нет'}</div><div>${esc(chill(d))}</div></div>`;
     } else {
       html += slots.map((s) => {
         let cls = '', status = '';
@@ -222,12 +222,32 @@
       const slots = slotsFor(d, state.settings.showAll);
       const isToday = sameDay(d, today);
       html += `<section class="week-day"><h3 class="${isToday ? 'today' : ''}">${WD_LONG[i]}, ${d.getDate()} ${MONTHS[d.getMonth()]}${isToday ? ' · сегодня' : ''}</h3>`;
-      html += slots.length ? slots.map((s) => slotHtml(s)).join('') : '<div class="none">Занятий нет</div>';
+      html += slots.length ? slots.map((s) => slotHtml(s)).join('') : `<div class="none"><span class="mini-critter" aria-hidden="true">${critter(d)}</span> Пар нет — ${esc(chill(d).charAt(0).toLowerCase() + chill(d).slice(1))}</div>`;
       html += '</section>';
     }
     html += footHtml();
     $('main').innerHTML = html;
   }
+
+  // Свободный день: зверёк и совет — свои для каждой даты, чтобы не мигали при обновлении
+  const CRITTERS = ['🐱', '🐶', '🦦', '🐹', '🐼', '🦊', '🐨', '🐧', '🦔', '🐻', '🐰', '🦥', '🐸', '🐿️', '🦫', '🐥'];
+  const CHILL = [
+    'Можно отдохнуть — или попить пивка 🍺',
+    'Пар нет, а пиво есть 🍻',
+    'Выспаться, а вечером — по пивку 🍺',
+    'Зверёк одобряет: сегодня пивной день 🍻',
+    'Отдыхай. Холодное пивко само себя не выпьет 🍺',
+    'Лучшая пара сегодня — ты и пивко 🍻',
+    'Никаких чертежей. Только диван и пиво 🍺',
+    'Можно погулять, можно поспать, можно пивка 🍻',
+  ];
+  function dayHash(d) {
+    let h = 0;
+    for (const ch of ymd(d)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return h;
+  }
+  const critter = (d, salt = 0) => CRITTERS[(dayHash(d) + salt) % CRITTERS.length];
+  const chill = (d) => CHILL[(dayHash(d) >>> 4) % CHILL.length];
 
   function footHtml() {
     const d = state.data;

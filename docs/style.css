@@ -141,9 +141,16 @@ main { padding: 14px 16px calc(var(--safe-bottom) + 32px); max-width: 720px; mar
 .break { color: var(--muted); font-size: 12px; text-align: center; margin: -2px 0 8px; }
 
 .empty {
-  text-align: center; color: var(--muted); padding: 48px 16px;
+  text-align: center; color: var(--muted); padding: 36px 16px 40px;
   background: var(--surface); border-radius: var(--radius); border: 1px dashed var(--line);
 }
+.empty .critter {
+  font-size: 64px; line-height: 1; margin-bottom: 12px; display: inline-block;
+  animation: bob 2.6s ease-in-out infinite;
+}
+@keyframes bob { 50% { transform: translateY(-6px) rotate(-4deg); } }
+@media (prefers-reduced-motion: reduce) { .empty .critter { animation: none; } }
+.mini-critter { font-size: 18px; vertical-align: -2px; margin-right: 2px; }
 .empty .big { font-size: 17px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
 
 .week-day { margin-bottom: 22px; }
