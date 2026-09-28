@@ -334,6 +334,15 @@
 
   function go(d) { state.sel = startOfDay(d); render(); }
 
+  const hasSunday = () => !!(course() && course().entries.some((x) => x.day === 7));
+
+  // Переход на n недель; с воскресенья без пар попадаем на понедельник
+  function shiftWeek(n) {
+    let next = addDays(state.sel, 7 * n);
+    if (isoWeekday(next) === 7 && !hasSunday()) next = mondayOf(next);
+    go(next);
+  }
+
   function bind() {
     $('days').addEventListener('click', (e) => {
       const b = e.target.closest('.day');
@@ -345,8 +354,8 @@
       render();
       window.scrollTo({ top: 0 });
     });
-    $('prevWeek').onclick = () => go(addDays(state.sel, -7));
-    $('nextWeek').onclick = () => go(addDays(state.sel, 7));
+    $('prevWeek').onclick = () => shiftWeek(-1);
+    $('nextWeek').onclick = () => shiftWeek(1);
     $('todayBtn').onclick = () => { go(new Date()); window.scrollTo({ top: 0, behavior: 'smooth' }); };
     document.querySelectorAll('.seg button').forEach((b) => {
       b.onclick = () => { state.settings.view = b.dataset.view; saveSettings(); render(); };
@@ -360,11 +369,9 @@
       const t = e.changedTouches[0];
       const dx = t.clientX - sx, dy = t.clientY - sy;
       if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - st > 700) return;
-      const step = state.settings.view === 'week' ? 7 : 1;
-      let next = addDays(state.sel, dx < 0 ? step : -step);
-      if (step === 1 && isoWeekday(next) === 7 && !(course() && course().entries.some((x) => x.day === 7))) {
-        next = addDays(next, dx < 0 ? 1 : -1); // воскресенье пропускаем
-      }
+      if (state.settings.view === 'week') { shiftWeek(dx < 0 ? 1 : -1); return; }
+      let next = addDays(state.sel, dx < 0 ? 1 : -1);
+      if (isoWeekday(next) === 7 && !hasSunday()) next = addDays(next, dx < 0 ? 1 : -1); // воскресенье пропускаем
       go(next);
     }, { passive: true });
 
@@ -395,8 +402,8 @@
 
     document.addEventListener('keydown', (e) => {
       if (e.target.closest('select, input')) return;
-      if (e.key === 'ArrowLeft') go(addDays(state.sel, state.settings.view === 'week' ? -7 : -1));
-      if (e.key === 'ArrowRight') go(addDays(state.sel, state.settings.view === 'week' ? 7 : 1));
+      if (e.key === 'ArrowLeft') state.settings.view === 'week' ? shiftWeek(-1) : go(addDays(state.sel, -1));
+      if (e.key === 'ArrowRight') state.settings.view === 'week' ? shiftWeek(1) : go(addDays(state.sel, 1));
       if (e.key === 'Escape') closeSheet();
     });
 
